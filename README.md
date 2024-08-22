@@ -7,7 +7,7 @@ Welcome to the Fortress Ruby SDK. This SDK provides a way for you to leverage th
 You can install the SDK using Gem. Simply run the following command:
 
 ```bash
-gem install fortress_sdk_ruby
+gem install fortress-sdk-ruby
 ```
 
 ## Quick Start
@@ -15,7 +15,7 @@ gem install fortress_sdk_ruby
 Here is a quick example to get you started with the SDK:
 
 ```ruby
-require 'fortress_sdk_ruby'
+require 'fortress'
 
 # Initialize the client
 client = Fortress::Client.new(api_key, organization_id)

@@ -3,7 +3,7 @@
 require_relative 'lib/fortress/version'
 
 Gem::Specification.new do |spec|
-  spec.name = 'fortress'
+  spec.name = 'fortress-sdk-ruby'
   spec.version = Fortress::VERSION
   spec.authors = ['Fortress']
   spec.email = ['founder@fortress.build']
@@ -13,7 +13,7 @@ Gem::Specification.new do |spec|
   spec.homepage = 'https://fortress.build'
   spec.required_ruby_version = '>= 3.0.0'
 
-  spec.metadata['allowed_push_host'] = 'https://rubygems.pkg.github.com/fortress-build'
+  spec.metadata['allowed_push_host'] = 'https://rubygems.org'
 
   spec.metadata['homepage_uri'] = spec.homepage
   spec.metadata['source_code_uri'] = 'https://github.com/fortress-build/sdk-ruby'

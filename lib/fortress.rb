@@ -87,6 +87,9 @@ module Fortress
       _ = make_request(:delete, endpoint)
     end
 
+    # Connect to a database.
+    # @param id [String] The database ID.
+    # @return [PG::Connection] The connection to the database.
     def connect_database(id)
       connection_details = get_connection_uri(id, 'database')
       PG::Connection.new(dbname: connection_details.database, user: connection_details.username,
