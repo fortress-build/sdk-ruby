@@ -45,12 +45,15 @@ module Fortress
     def initialize(org_id, api_key)
       @org_id = org_id
       @api_key = api_key
+      @tenant_connection_cache = {}
     end
 
     # Connect to a tenant.
     # @param id [String] The tenant ID.
     # @return [PG::Connection] The connection to the tenant database.
     def connect_tenant(id)
+      return @tenant_connection_cache[id] if @tenant_connection_cache.key?(id)
+
       connection_details = get_connection_uri(id, 'tenant')
       PG::Connection.new(dbname: connection_details.database, user: connection_details.username,
                          password: connection_details.password, host: connection_details.url, port: connection_details.port)
@@ -59,11 +62,13 @@ module Fortress
     # Create a tenant in a database.
     # @param id [String] The tenant ID.
     # @param tenant_alias [String] The tenant alias.
-    # @param database_id [String] The database ID. (optional)
+    # @param isolation_level [String] The isolation level for the tenant (shared or dedicated).
+    # @param platform [String] The cloud platform (aws or managed).
+    # @param database_id [String] The database ID. (either cloud_provider or database_id must be provided)
     # @return [void]
-    def create_tenant(id, tenant_alias, database_id = nil)
+    def create_tenant(id, tenant_alias, isolation_level, platform_provider, database_id = nil)
       endpoint = "#{BASE_URL}/v1/organization/#{@org_id}/tenant/#{id}"
-      body = { alias: tenant_alias }
+      body = { alias: tenant_alias, isolation: isolation_level, platform: platform_provider }
       body[:databaseId] = database_id if database_id
       _ = make_request(:post, endpoint, body)
     end
@@ -87,21 +92,13 @@ module Fortress
       _ = make_request(:delete, endpoint)
     end
 
-    # Connect to a database.
-    # @param id [String] The database ID.
-    # @return [PG::Connection] The connection to the database.
-    def connect_database(id)
-      connection_details = get_connection_uri(id, 'database')
-      PG::Connection.new(dbname: connection_details.database, user: connection_details.username,
-                         password: connection_details.password, host: connection_details.url, port: connection_details.port)
-    end
-
     # Create a database.
     # @param database_alias [String] The database alias.
+    # @param platform [String] The cloud provider (aws or managed).
     # @return [String] The database ID.
-    def create_database(database_alias)
+    def create_database(database_alias, platform_provider)
       endpoint = "#{BASE_URL}/v1/organization/#{@org_id}/database"
-      response = make_request(:post, endpoint, { alias: database_alias })
+      response = make_request(:post, endpoint, { alias: database_alias, platform: platform_provider })
       response['id']
     end
 
@@ -150,8 +147,6 @@ module Fortress
       request['Content-Type'] = 'application/json'
       request['Api-Key'] = @api_key
       http = Net::HTTP.new(uri.host, uri.port)
-
-      # TODO: Enable SSL
       http.use_ssl = true
 
       request.body = body.to_json if body

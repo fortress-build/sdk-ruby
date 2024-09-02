@@ -7,7 +7,7 @@ client = Fortress::Fortress.new('orgId', 'apiKey')
 id = client.create_database('Client 1')
 
 # Create a tenant in that database
-client.create_tenant('client1', 'Client 1', id)
+client.create_tenant('client1', 'dedicate', 'aws', 'Client 1', id)
 
 # List all tenants
 client.list_tenants.each do |tenant|
